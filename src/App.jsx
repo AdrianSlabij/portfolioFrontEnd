@@ -13,6 +13,7 @@ const API_URL =
 //                 'totalValue': item_value,
 //                 'timestamp': latest_history.get('timestamp', 'N/A'),
 //                 'explanation': latest_history.get('explanation', 'No analysis available.')
+//                 'percentChange': latest_history.get('percentChange', 0)
 //
 //             })
 
