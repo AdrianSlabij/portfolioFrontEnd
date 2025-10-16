@@ -1,42 +1,248 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* General Body & App Container Styles */
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #111827; /* bg-gray-900 */
+    color: #F9FAFB; /* text-gray-50 */
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.app-container {
+    min-height: 100vh;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.main-content {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* Header */
+.app-header {
+    background-color: #1F2937; /* bg-gray-800 */
+    padding: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
+.app-header h1 {
+    font-size: 1.875rem; /* text-3xl */
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.05em; /* tracking-wider */
+}
+
+/* Generic Card Style */
 .card {
-  padding: 2em;
+    background-color: #1F2937; /* bg-gray-800 */
+    padding: 1.5rem;
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    margin-top: 2rem;
 }
 
-.read-the-docs {
-  color: #888;
+.card h2 {
+    font-size: 1.125rem; /* text-lg */
+    font-weight: 600;
+    color: #9CA3AF; /* text-gray-400 */
+    margin-bottom: 1rem;
+}
+
+/* Dashboard Grid & Metrics */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr 2fr;
+    }
+}
+
+.metric-card {
+    background-color: #1F2937;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.metric-card h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #9CA3AF;
+    margin-bottom: 0.5rem;
+}
+
+.total-value-text {
+    font-size: 2.25rem; /* text-4xl */
+    font-weight: 700;
+    color: #34D399; /* text-green-400 */
+}
+
+/* Chart Container */
+
+.chart-container {
+    background-color: #1F2937;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    height: 24rem; /* h-96 */
+    display: flex;         /* Added this line */
+    flex-direction: column;/* Added this line */
+}
+
+.chart-container h2 {
+    text-align: center;
+}
+
+.empty-chart {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Holdings Table */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.holdings-table {
+    width: 100%;
+    text-align: left;
+}
+
+.holdings-table th, .holdings-table td {
+    padding: 0.75rem;
+}
+
+.holdings-table thead tr {
+    border-bottom: 1px solid #374151; /* border-gray-700 */
+}
+
+.holdings-table tbody tr {
+    border-bottom: 1px solid #374151;
+    transition: background-color 0.2s;
+}
+
+.holdings-table tbody tr:hover {
+    background-color: #374151; /* hover:bg-gray-700 */
+}
+
+.ticker-cell {
+    font-family: monospace;
+    font-weight: 700;
+}
+
+.value-cell {
+    font-weight: 600;
+}
+
+.actions-cell {
+    text-align: right;
+}
+
+/* AI Note styles */
+.ai-note-row {
+    background-color: #374151;
+}
+
+.ai-note-content {
+    background-color: #111827;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+}
+
+.ai-note-header {
+    font-weight: 600;
+    color: #D1D5DB; /* text-gray-300 */
+    margin-bottom: 0.25rem;
+}
+
+.ai-note-body {
+    color: #9CA3AF; /* text-gray-400 */
+    font-style: italic;
+}
+
+
+/* Form Styles */
+.add-holding-form {
+    display: flex;
+    gap: 1rem;
+}
+
+.add-holding-form input {
+    flex-grow: 1;
+    padding: 0.75rem;
+    background-color: #374151;
+    border-radius: 0.25rem;
+    border: 1px solid #4B5563; /* border-gray-600 */
+    color: white;
+}
+
+.add-holding-form input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #3B82F6; /* focus:ring-2 focus:ring-blue-500 */
+}
+
+/* Button Styles */
+.button-primary {
+    background-color: #2563EB; /* bg-blue-600 */
+    color: white;
+    font-weight: 700;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.25rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.button-primary:hover {
+    background-color: #3B82F6; /* hover:bg-blue-500 */
+}
+
+.button-link {
+    background: none;
+    border: none;
+    color: #60A5FA; /* text-blue-400 */
+    cursor: pointer;
+    margin-right: 1rem;
+}
+
+.button-link:hover {
+    color: #93C5FD; /* hover:text-blue-300 */
+}
+
+.button-danger {
+    background: none;
+    border: none;
+    color: #EF4444; /* text-red-500 */
+    cursor: pointer;
+}
+
+.button-danger:hover {
+    color: #F87171; /* hover:text-red-400 */
+}
+
+/* Utility & Messaging */
+.loading-message, .error-message, .empty-holdings-message {
+    text-align: center;
+    font-size: 1.125rem;
+    margin-top: 1rem;
+}
+
+.error-message {
+    color: #EF4444; /* text-red-500 */
+}
+
+/* Added styles for positive and negative text */
+.text-positive {
+    color: #34D399; /* A nice green color */
+}
+
+.text-negative {
+    color: #EF4444; /* A nice red color */
 }

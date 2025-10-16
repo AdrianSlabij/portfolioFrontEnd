@@ -1,103 +1,224 @@
-import reactLogo from "./assets/react.svg";
-import "./App.css";
 import React, { useState, useEffect, useCallback } from "react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import "./App.css"; // Import the new CSS file
 
+// --- Configuration ---
 const API_URL =
   "https://p3ztqsgahh.execute-api.us-east-2.amazonaws.com/portfolio";
 
-// portfolio_data.append({
-//
-//                 'ticker': ticker,
-//                 'quantity': quantity,
-//                 'currentPrice': current_price,
-//                 'totalValue': item_value,
-//                 'timestamp': latest_history.get('timestamp', 'N/A'),
-//                 'explanation': latest_history.get('explanation', 'No analysis available.')
-//                 'percentChange': latest_history.get('percentChange', 0)
-//
-//             })
+// --- Helper Components ---
 
-const HoldingsTable = ({ holdings }) => {
+const Header = () => (
+  <header className="app-header">
+    <h1>My AI-Powered Portfolio Monitor</h1>
+  </header>
+);
+
+const DashboardMetrics = ({ totalValue }) => (
+  <div className="metric-card">
+    <h2>Total Portfolio Value</h2>
+    <p className="total-value-text">
+      $
+      {totalValue.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}
+    </p>
+  </div>
+);
+
+const HoldingsChart = ({ holdings }) => {
+  const chartData = holdings.map((h) => ({
+    name: h.ticker,
+    value: h.totalValue,
+  }));
+  const COLORS = [
+    "#0088FE",
+    "#00C49F",
+    "#FFBB28",
+    "#FF8042",
+    "#8884d8",
+    "#ff4d4d",
+  ];
+
+  if (holdings.length === 0) {
+    return (
+      <div className="chart-container empty-chart">
+        <p>No data available for chart.</p>
+      </div>
+    );
+  }
+
   return (
-    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-      <thead class="bg-gray-50 dark:bg-gray-700">
-        <tr>
-          <th
-            scope="col"
-            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+    <div className="chart-container">
+      <h2>Asset Allocation</h2>
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={chartData}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            outerRadius={120}
+            fill="#8884d8"
+            dataKey="value"
+            nameKey="name"
           >
-            Ticker
-          </th>
-          <th
-            scope="col"
-            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-          >
-            Quantity
-          </th>
-          <th
-            scope="col"
-            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-          >
-            Current Price
-          </th>
-          <th
-            scope="col"
-            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-          >
-            Total Value
-          </th>
-          <th
-            scope="col"
-            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-          >
-            Percent Change
-          </th>
-          <th
-            scope="col"
-            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-          >
-            Timestamp
-          </th>
-          <th
-            scope="col"
-            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-          >
-            Explanation
-          </th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
-        {holdings.map((holding) => (
-          <tr key={holding.id} class="hover:bg-gray-100 dark:hover:bg-gray-600">
-            <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-              {holding.ticker}
-            </td>
-            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
-              {holding.quantity}
-            </td>
-            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
-              {holding.currentPrice}
-            </td>
-            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
-              {holding.totalValue}
-            </td>
-            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
-              {holding.percentChange}
-            </td>
-            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
-              {holding.timestamp}
-            </td>
-            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
-              {holding.explanation}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+            {chartData.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={COLORS[index % COLORS.length]}
+              />
+            ))}
+          </Pie>
+          <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+          <Legend />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 
-function App() {
+const HoldingsTable = ({ holdings, onRemove }) => {
+  const [expandedRow, setExpandedRow] = useState(null);
+
+  const toggleRow = (ticker) => {
+    setExpandedRow(expandedRow === ticker ? null : ticker);
+  };
+
+  if (holdings.length === 0) {
+    return (
+      <p className="empty-holdings-message">
+        You have no holdings in your portfolio.
+      </p>
+    );
+  }
+
+  return (
+    <div className="card">
+      <h2>Your Holdings</h2>
+      <div className="table-wrapper">
+        <table className="holdings-table">
+          <thead>
+            <tr>
+              <th>Ticker</th>
+              <th>Quantity</th>
+              <th>Current Price</th>
+              <th>Total Value</th>
+              <th>Percent Change</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {holdings.map((holding) => (
+              <React.Fragment key={holding.ticker}>
+                <tr>
+                  <td className="ticker-cell">{holding.ticker}</td>
+                  <td>{holding.quantity}</td>
+                  <td>${holding.currentPrice.toFixed(2)}</td>
+                  <td className="value-cell">
+                    ${holding.totalValue.toFixed(2)}
+                  </td>
+                  <td
+                    className={`value-cell ${holding.percentChange > 0 ? "text-positive" : holding.percentChange < 0 ? "text-negative" : ""}`}
+                  >
+                    {holding.percentChange > 0 ? "+" : ""}
+                    {holding.percentChange.toFixed(2)}%
+                  </td>
+                  <td className="actions-cell">
+                    <button
+                      onClick={() => toggleRow(holding.ticker)}
+                      className="button-link"
+                    >
+                      {expandedRow === holding.ticker
+                        ? "Hide AI Note"
+                        : "Show AI Note"}
+                    </button>
+                    <button
+                      onClick={() => onRemove(holding.ticker)}
+                      className="button-danger"
+                    >
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+                {expandedRow === holding.ticker && (
+                  <tr className="ai-note-row">
+                    <td colSpan="5">
+                      <div className="ai-note-content">
+                        <p className="ai-note-header">
+                          AI Analyst Note (
+                          {new Date(holding.timestamp).toLocaleString()}):
+                        </p>
+                        <p className="ai-note-body">{holding.explanation}</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+const AddHoldingForm = ({ onAdd, setIsLoading }) => {
+  const [ticker, setTicker] = useState("");
+  const [quantity, setQuantity] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!ticker || !quantity || parseFloat(quantity) <= 0) {
+      alert("Please enter a valid ticker and quantity.");
+      return;
+    }
+
+    console.log("Form submitted with:", {
+      ticker,
+      quantity: parseFloat(quantity),
+    });
+    setIsLoading(true);
+    await onAdd(ticker, parseFloat(quantity));
+    setTicker("");
+    setQuantity("");
+  };
+
+  return (
+    <div className="card">
+      <h2>Add or Update Holding</h2>
+      <form onSubmit={handleSubmit} className="add-holding-form">
+        <input
+          type="text"
+          value={ticker}
+          onChange={(e) => setTicker(e.target.value.toUpperCase())}
+          placeholder="Ticker (e.g., AAPL)"
+        />
+        <input
+          type="number"
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
+          placeholder="Quantity"
+        />
+        <button type="submit" className="button-primary">
+          Save Holding
+        </button>
+      </form>
+    </div>
+  );
+};
+
+// --- Main App Component ---
+
+export default function App() {
   const [portfolioData, setPortfolioData] = useState({
     holdings: [],
     totalValue: 0,
@@ -127,25 +248,62 @@ function App() {
     fetchData();
   }, [fetchData]);
 
+  const handleUpdateHolding = async (ticker, quantity) => {
+    console.log("handleUpdateHolding called with:", { ticker, quantity });
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ticker, quantity }),
+      });
+      const result = await response.json();
+      if (!response.ok)
+        throw new Error(result.error || "Failed to update holding.");
+      alert(result.message);
+      fetchData();
+    } catch (e) {
+      setError(e.message);
+      console.error("Failed to update holding:", e);
+      alert(`Error: ${e.message}`);
+      setIsLoading(false);
+    }
+  };
+
+  const handleRemoveHolding = (ticker) => {
+    if (
+      window.confirm(
+        `Are you sure you want to remove ${ticker} from your portfolio?`
+      )
+    ) {
+      handleUpdateHolding(ticker, 0);
+    }
+  };
+
   return (
-    <div>
-      <div className="sticky top-0 bg-gray-900/80 backdrop-blur-lg py-4 z-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 border-b border-gray-700">
-        <h1 className="text-3xl font-bold text-white tracking-tight">
-          Portfolio Monitoring
-        </h1>
-        <p className="text-gray-400 mt-1">
-          Welcome back, here's your portfolio snapshot.
-        </p>
-      </div>
-      <HoldingsTable holdings={portfolioData.holdings}></HoldingsTable>
+    <div className="app-container">
+      <Header />
+      <main className="main-content">
+        {isLoading && (
+          <p className="loading-message">Loading portfolio data...</p>
+        )}
+        {error && <p className="error-message">Error: {error}</p>}
+        {!isLoading && !error && (
+          <>
+            <div className="dashboard-grid">
+              <DashboardMetrics totalValue={portfolioData.totalValue} />
+              <HoldingsChart holdings={portfolioData.holdings} />
+            </div>
+            <AddHoldingForm
+              onAdd={handleUpdateHolding}
+              setIsLoading={setIsLoading}
+            />
+            <HoldingsTable
+              holdings={portfolioData.holdings}
+              onRemove={handleRemoveHolding}
+            />
+          </>
+        )}
+      </main>
     </div>
-
-    // <div className="App">
-    //   <header className="App-header">
-    //     {/* <img src={reactLogo} className="logo react" alt="React logo" /> */}
-
-    //   </header>
-    // </div>
   );
 }
-export default App;
